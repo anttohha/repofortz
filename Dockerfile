@@ -1,12 +1,6 @@
-FROM python:3.4
-
-RUN groupadd -r uwsgi && useradd -r -g uwsgi uwsgi
-RUN pip install Flask==0.10.1 uWSGI==2.0.8 requests==2.5.1 redis==2.10.3
+FROM python:3.8-alpine
+RUN mkdir /app
+ADD . /app
 WORKDIR /app
-COPY app /app
-
-
-EXPOSE 9090 9191
-USER uwsgi
-
-CMD [exec python "identidock.py"]
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]
