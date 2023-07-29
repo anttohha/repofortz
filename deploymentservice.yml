@@ -1,0 +1,40 @@
+
+   
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smallapp-deployment
+  namespace: pre-production
+  labels:
+    app: smallapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smallapp
+  template:
+    metadata:
+      labels:
+        app: smallapp 
+    spec:
+      containers:
+      - name: smallapp
+        image: anttohha/smallapp2:latest
+      
+        
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeapp-service
+spec:
+  selector:
+    app: smallapp 
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 3000
+    nodePort: 31110
