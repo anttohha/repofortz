@@ -1,7 +1,8 @@
-FROM python:3.10-slim
-RUN mkdir /app
-ADD . /app
-WORKDIR /app
-RUN apt update -y && apt-get install -y libpq-dev
-RUN pip install Flask
-CMD ["python", "app.py"]
+FROM node:19-alpine3.16
+WORKDIR /react-app
+COPY package.json .
+COPY package-lock.json .
+RUN npm i
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
