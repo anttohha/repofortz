@@ -113,7 +113,7 @@ pipeline{
               sh '''
                 #!/bin/bash 
                    echo 'Waiting 5 minutes (pre-production) for deployment to k8s'
-                   sleep 300
+                   sleep 150
                    ip1=$(kubectl --kubeconfig=/home/configk8s get svc -n pre-production | awk '{ print \$4}' | tail -n1)
                    echo $ip1
                    port1=$(kubectl --kubeconfig=/home/configk8s get svc -n pre-production | awk '{ print \$5}' | tail -n1 | cut -c 1-4)
@@ -154,13 +154,13 @@ pipeline{
         steps{
             sh '''
             #!/bin/bash
-            namesercice = $(kubectl --kubeconfig=configk8s get svc -n pre-production | awk '{ print \$1}'| tail -n1)
-            podsfordelete=$(kubectl --kubeconfig=configk8s get pods -n pre-production | awk '{ print \$1}'| tail -n1)
-            namedeployment=$(kubectl --kubeconfig=configk8s get deployment -n pre-production | awk '{ print \$1}'| tail -n1)
-            
-            kubectl --kubeconfig=configk8s delete svc $namesercice -n pre-production
-            kubectl --kubeconfig=configk8s delete pods $podsfordelete -n pre-production
-            kubectl --kubeconfig=configk8s delete deployment $namedeployment -n pre-production
+            namesercice=$(kubectl --kubeconfig=/home/configk8s get svc -n pre-production | awk '{ print \$1}'| tail -n1)
+            podsfordelete=$(kubectl --kubeconfig=/home/configk8s get pods -n pre-production | awk '{ print \$1}'| tail -n1)
+            namedeployment=$(kubectl --kubeconfig=/home/configk8s get deployment -n pre-production | awk '{ print \$1}'| tail -n1)
+                             
+            kubectl --kubeconfig=/home/configk8s delete svc $namesercice -n pre-production
+            kubectl --kubeconfig=/home/configk8s delete pods $podsfordelete -n pre-production
+            kubectl --kubeconfig=/home/configk8s delete deployment $namedeployment -n pre-production
             '''
         }
     }
