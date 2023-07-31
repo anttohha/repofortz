@@ -112,7 +112,7 @@ pipeline{
             steps {
               sh '''
                 #!/bin/bash 
-                   echo 'Waiting 5 minutes for deployment to k8s'
+                   echo 'Waiting 5 minutes (pre-production) for deployment to k8s'
                    sleep 300
                    ip1=$(kubectl --kubeconfig=/home/configk8s get svc -n pre-production | awk '{ print \$4}' | tail -n1)
                    echo $ip1
@@ -122,14 +122,23 @@ pipeline{
                    
                     
               '''
-               
-              
-                
-              
             }
+            post {
+                success {
+                    echo 'something on port 3000 ......'
+                }
+                failure {
+                    echo 'something went wrong, and fail'
+                    error('Stopping early…')
+
+                }
         }
+    }
         
     stage('Deploy to prodation'){
+        input{
+            message "Do you want to deploy in production ?"
+         }
         steps{
              
              sh 'ls'
@@ -139,7 +148,22 @@ pipeline{
              emailext body: 'deploy  from dockerhub to k8s , this is e-mail notificatuin', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
              
         }
-    }       
+    } 
+    
+    stage('delete namespace from pre-production'){
+        steps{
+            sh '''
+            #!/bin/bash
+            namesercice = $(kubectl --kubeconfig=configk8s get svc -n pre-production | awk '{ print \$1}'| tail -n1)
+            podsfordelete=$(kubectl --kubeconfig=configk8s get pods -n pre-production | awk '{ print \$1}'| tail -n1)
+            namedeployment=$(kubectl --kubeconfig=configk8s get deployment -n pre-production | awk '{ print \$1}'| tail -n1)
+            
+            kubectl --kubeconfig=configk8s delete svc $namesercice -n pre-production
+            kubectl --kubeconfig=configk8s delete pods $podsfordelete -n pre-production
+            kubectl --kubeconfig=configk8s delete deployment $namedeployment -n pre-production
+            '''
+        }
+    }
     
    
     
